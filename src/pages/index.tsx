@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
@@ -7,6 +10,10 @@ import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
   const { user, isLoaded, isSignedIn } = useUser();
+  // const { data } = api.example.getAll.useQuery();
+  const { data } = api.post.getAll.useQuery();
+
+  // console.log(data);
 
   return (
     <>
@@ -19,20 +26,22 @@ const Home: NextPage = () => {
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
           {!isSignedIn && (
             <SignInButton mode="modal">
-              <button className="rounded-lg bg-slate-400 py-2 px-6 text-white">
+              <button className="rounded-lg bg-blue-700 py-2 px-6 text-white">
                 Sign in
               </button>
             </SignInButton>
           )}
           {isSignedIn && (
             <SignOutButton>
-              <button className="rounded-lg bg-slate-400 py-2 px-6 text-white">
+              <button className="rounded-lg bg-blue-700 py-2 px-6 text-white">
                 Sign out
               </button>
             </SignOutButton>
           )}
         </div>
-        {/* <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" /> */}
+        {data?.map((post) => {
+          return <div key={post.id}>{post.content}</div>;
+        })}
       </main>
     </>
   );
