@@ -11,9 +11,8 @@ import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { api } from "~/utils/api";
 import type { RouterOutputs } from "~/utils/api";
-import { Loading, LoadingSpinner } from "~/components/loading";
-
 dayjs.extend(relativeTime);
+import { LoadingSpinner } from "~/components/Loading";
 
 const CreatePostWizard = () => {
   const { user, isLoaded } = useUser();
