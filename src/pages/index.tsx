@@ -58,7 +58,7 @@ const PostView = (props: PostWithUser) => {
           {/* prettier-ignore */}
           <span className="text-slate-500">{` • ${dayjs(post.createdAt).fromNow()}`}</span>
         </div>
-        <span>{post.content}</span>
+        <span className="text-xl">{post.content}</span>
       </div>
     </div>
   );
