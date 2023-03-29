@@ -11,11 +11,12 @@ import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { api } from "~/utils/api";
 import type { RouterOutputs } from "~/utils/api";
+import { Loading, LoadingSpinner } from "~/components/loading";
 
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   console.log(user);
 
   if (!user) return null;
@@ -62,16 +63,38 @@ const PostView = (props: PostWithUser) => {
     </div>
   );
 };
+const Feed = () => {
+  const { data, isLoading: postLoading } = api.post.getAll.useQuery();
 
-const Home: NextPage = () => {
-  const { user, isSignedIn } = useUser();
-  // console.log(user);
-  // const { data } = api.example.getAll.useQuery();
-  const { data, isLoading } = api.post.getAll.useQuery();
-
-  if (isLoading) return <div>...Loading</div>;
+  if (postLoading) return <LoadingSpinner />;
 
   if (!data) return <div>Something went wrong</div>;
+
+  return (
+    <div className="flex flex-col">
+      {[...data, ...data]?.map((fullpost) => {
+        return (
+          <PostView {...fullpost} key={fullpost.post.id} />
+          // <div className="border-b border-slate-400 p-8" key={post.id}>
+          //   {post.content}
+          // </div>
+        );
+      })}
+    </div>
+  );
+};
+const Home: NextPage = () => {
+  const { user, isSignedIn, isLoaded: userLoaded } = useUser();
+  // console.log(user);
+  // const { data } = api.example.getAll.useQuery();
+
+  // fetch data asap
+  api.post.getAll.useQuery();
+  if (!userLoaded) return <div></div>;
+
+  // if (postLoaded) return <LoadingSpinner />;
+  //return empty div if data is not loaded
+  // if (!data) return <div>Something went wrong</div>;
 
   // console.log(data);
 
@@ -105,16 +128,7 @@ const Home: NextPage = () => {
               </div>
             )}
           </div>
-          <div className="flex flex-col">
-            {[...data, ...data]?.map((fullpost) => {
-              return (
-                <PostView {...fullpost} key={fullpost.post.id} />
-                // <div className="border-b border-slate-400 p-8" key={post.id}>
-                //   {post.content}
-                // </div>
-              );
-            })}
-          </div>
+          <Feed />
         </div>
       </main>
     </>
