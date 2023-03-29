@@ -38,7 +38,7 @@ const CreatePostWizard = () => {
   if (!user) return null;
 
   return (
-    <div className="full flex items-center gap-4">
+    <div className="full flex items-center gap-4 align-middle">
       <Image
         src={user.profileImageUrl}
         alt="Profile image"
@@ -49,7 +49,7 @@ const CreatePostWizard = () => {
       <input
         type="text"
         placeholder="Type some emojis"
-        className="grow bg-transparent text-white outline-none"
+        className=" grow bg-transparent text-white outline-none"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         disabled={isPosting}
