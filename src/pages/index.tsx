@@ -13,10 +13,27 @@ import { api } from "~/utils/api";
 import type { RouterOutputs } from "~/utils/api";
 dayjs.extend(relativeTime);
 import { LoadingSpinner } from "~/components/Loading";
+import { useState } from "react";
 
 const CreatePostWizard = () => {
   const { user, isLoaded } = useUser();
-  console.log(user);
+  const ctx = api.useContext();
+
+  const { mutate, isLoading: isPosting } = api.post.create.useMutation({
+    onSuccess: () => {
+      setInput("");
+      /*This line below is used to update 
+      the content automatically without reloading*/
+      /*Because the line returns a promise and we 
+      have not used await, we get an error
+      to solve that we add void to tell ts that
+      we expect nothing*/
+      void ctx.post.getAll.invalidate();
+    },
+  });
+
+  const [input, setInput] = useState("");
+  // console.log(user);
 
   if (!user) return null;
 
@@ -33,7 +50,18 @@ const CreatePostWizard = () => {
         type="text"
         placeholder="Type some emojis"
         className="grow bg-transparent text-white outline-none"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        disabled={isPosting}
       />
+      <button
+        onClick={() => {
+          mutate({ content: input });
+        }}
+        className="rounded-lg bg-slate-700 py-2 px-6 text-white"
+      >
+        Post
+      </button>
     </div>
   );
 };
@@ -71,7 +99,7 @@ const Feed = () => {
 
   return (
     <div className="flex flex-col">
-      {[...data, ...data]?.map((fullpost) => {
+      {data.map((fullpost) => {
         return (
           <PostView {...fullpost} key={fullpost.post.id} />
           // <div className="border-b border-slate-400 p-8" key={post.id}>
@@ -83,7 +111,7 @@ const Feed = () => {
   );
 };
 const Home: NextPage = () => {
-  const { user, isSignedIn, isLoaded: userLoaded } = useUser();
+  const { isSignedIn, isLoaded: userLoaded } = useUser();
   // console.log(user);
   // const { data } = api.example.getAll.useQuery();
 

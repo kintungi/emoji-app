@@ -6,7 +6,11 @@ import { z } from "zod";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  privateProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import { User } from "@clerk/nextjs/dist/api";
 
 const filterUserForClient = (user: User) => {
@@ -20,7 +24,12 @@ const filterUserForClient = (user: User) => {
 export const postRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-    const posts = await ctx.prisma.post.findMany({ take: 100 });
+    const posts = await ctx.prisma.post.findMany({
+      take: 100,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
     const users = (
       await clerkClient.users.getUserList({
@@ -45,4 +54,22 @@ export const postRouter = createTRPCRouter({
       };
     });
   }),
+  create: privateProcedure
+    .input(
+      z.object({
+        content: z.string().emoji().min(1).max(280),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const authorId = ctx.userId;
+
+      const post = await ctx.prisma.post.create({
+        data: {
+          authorId,
+          content: input.content,
+        },
+      });
+
+      return post;
+    }),
 });
