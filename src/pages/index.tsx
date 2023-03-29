@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Head from "next/head";
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
-
+import Image from "next/image";
 import { api } from "~/utils/api";
 import type { RouterOutputs } from "~/utils/api";
 
@@ -22,7 +22,7 @@ const CreatePostWizard = () => {
 
   return (
     <div className="full flex items-center gap-4">
-      <img
+      <Image
         src={user.profileImageUrl}
         alt="Profile image"
         width={96}
@@ -44,10 +44,12 @@ const PostView = (props: PostWithUser) => {
   const { post, author } = props;
   return (
     <div className="flex gap-4 border-b border-slate-400 p-4" key={post.id}>
-      <img
+      <Image
         src={author.profilePicture}
         alt="author image"
         className="h-14 w-14 rounded-full"
+        width={96}
+        height={96}
       />
       <div className="flex flex-col">
         <div className="flex gap-[6px] text-[14px] text-slate-300">
@@ -67,7 +69,7 @@ const Home: NextPage = () => {
   // const { data } = api.example.getAll.useQuery();
   const { data, isLoading } = api.post.getAll.useQuery();
 
-  if (isLoading) return <div>..Loading</div>;
+  if (isLoading) return <div>...Loading</div>;
 
   if (!data) return <div>Something went wrong</div>;
 
