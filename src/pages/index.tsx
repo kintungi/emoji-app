@@ -15,6 +15,7 @@ dayjs.extend(relativeTime);
 import { LoadingSpinner } from "~/components/Loading";
 import { useState } from "react";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const CreatePostWizard = () => {
   const { user, isLoaded } = useUser();
@@ -99,9 +100,16 @@ const PostView = (props: PostWithUser) => {
       />
       <div className="flex flex-col">
         <div className="flex gap-[6px] text-[14px] text-slate-300">
-          <span className="font-bold">{`@${author.username} `}</span>
+          <Link href={`/@${author.username}`}>
+            <span className="font-bold">{`@${author.username} `}</span>
+          </Link>
           {/* prettier-ignore */}
-          <span className="text-slate-500">{` • ${dayjs(post.createdAt).fromNow()}`}</span>
+          <span className="text-slate-500">{` • `}</span>
+          <Link href={`/post/${post.id}`}>
+            <span className="text-slate-500">{` ${dayjs(
+              post.createdAt
+            ).fromNow()}`}</span>
+          </Link>
         </div>
         <span className="text-xl">{post.content}</span>
       </div>
