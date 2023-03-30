@@ -14,6 +14,7 @@ import type { RouterOutputs } from "~/utils/api";
 dayjs.extend(relativeTime);
 import { LoadingSpinner } from "~/components/Loading";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const CreatePostWizard = () => {
   const { user, isLoaded } = useUser();
@@ -29,6 +30,15 @@ const CreatePostWizard = () => {
       to solve that we add void to tell ts that
       we expect nothing*/
       void ctx.post.getAll.invalidate();
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+
+      if (errorMessage && errorMessage[0]) {
+        toast.error(errorMessage[0]);
+      } else {
+        toast.error("Failed to post, please try again later!");
+      }
     },
   });
 
@@ -53,14 +63,22 @@ const CreatePostWizard = () => {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         disabled={isPosting}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (input !== "") mutate({ content: input });
+          }
+        }}
       />
       <button
+        disabled={isPosting}
         onClick={() => {
           mutate({ content: input });
+          // toast.success("Post submitted");
         }}
         className="rounded-lg bg-slate-700 py-2 px-6 text-white"
       >
-        Post
+        {!isPosting ? <span>Post</span> : <LoadingSpinner />}
       </button>
     </div>
   );
@@ -93,7 +111,7 @@ const PostView = (props: PostWithUser) => {
 const Feed = () => {
   const { data, isLoading: postLoading } = api.post.getAll.useQuery();
 
-  if (postLoading) return <LoadingSpinner />;
+  if (postLoading) return <LoadingSpinner size={60} />;
 
   if (!data) return <div>Something went wrong</div>;
 
