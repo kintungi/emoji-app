@@ -21,8 +21,8 @@ const PostView = (props: PostWithUser) => {
       />
       <div className="flex flex-col">
         <div className="flex gap-[6px] text-[14px] text-slate-300">
-          <Link href={`/@${author.username}`}>
-            <span className="font-bold">{`@${author.username} `}</span>
+          <Link href={`/@${author.username ?? ""}`}>
+            <span className="font-bold">{`@${author.username ?? ""}`}</span>
           </Link>
           {/* prettier-ignore */}
           <span className="text-slate-500">{` • `}</span>

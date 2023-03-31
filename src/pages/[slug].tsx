@@ -10,6 +10,10 @@ import Head from "next/head";
 import { api } from "~/utils/api";
 dayjs.extend(relativeTime);
 import Image from "next/image";
+import { generateSSGHelper } from "~/server/helpers/ssgHelper";
+import Layout from "~/components/Layout";
+import { LoadingSpinner } from "~/components/Loading";
+import PostView from "~/components/PostView";
 
 // type PageProps = InferGetStaticPropsType<typeof getStaticProps>;
 
@@ -66,21 +70,8 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
 };
 
 export default ProfilePage;
-
-import { createProxySSGHelpers } from "@trpc/react-query/ssg";
-import { prisma } from "~/server/db";
-import { appRouter } from "~/server/api/root";
-import superjson from "superjson";
-import Layout from "~/components/Layout";
-import { LoadingSpinner } from "~/components/Loading";
-import PostView from "~/components/PostView";
-
 export const getStaticProps: GetStaticProps = async (context) => {
-  const ssg = createProxySSGHelpers({
-    router: appRouter,
-    ctx: { prisma, userId: null },
-    transformer: superjson, // optional - adds superjson serialization
-  });
+  const ssg = generateSSGHelper();
 
   const slug = context.params?.slug;
 
